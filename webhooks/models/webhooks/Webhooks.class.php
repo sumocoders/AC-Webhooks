@@ -43,10 +43,11 @@
      * @param unknown_type $event
      * @param unknown_type $args
      */
-    static function handleEvent($event, $args)
-    {
+    static function handleEvent($event, $args) {
+      // grab the webhook
       $webhook = Webhooks::findByEventname($event);
 
+      // valid webhook?
       if($webhook !== null)
       {
         // set options
