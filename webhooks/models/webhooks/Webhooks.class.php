@@ -95,6 +95,7 @@
     {
       return array(
         'on_activity_log_decorator',
+        'on_acivity_log_decorator',
         'on_activity_log_callbacks',
         'on_admin_panel',
         'on_admin_tabs',
@@ -191,7 +192,7 @@
         'on_users_tabs',
         'on_visible_contexts',
         'on_wireframe_updates'
-    );
+      );
     }
 
 
