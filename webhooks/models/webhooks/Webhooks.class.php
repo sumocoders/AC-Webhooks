@@ -53,7 +53,7 @@
         // set options
         $options[CURLOPT_URL] = $webhook->getCallback();
         $options[CURLOPT_USERAGENT] = 'ActiveCollab/' . APPLICATION_VERSION . ' Webhooks/' . self::VERSION;
-        $options[CURLOPT_TIMEOUT] = 10;
+        $options[CURLOPT_TIMEOUT] = 5;
         $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
         $options[CURLOPT_FAILONERROR] = true;
         $options[CURLOPT_FOLLOWLOCATION] = true;
@@ -72,18 +72,8 @@
         // execute
         curl_exec($curl);
 
-        // fetch errors
-        $errorNumber = curl_errno($curl);
-        $errorMessage = curl_error($curl);
-
         // close
         curl_close($curl);
-
-        // error?
-        if($errorNumber != '')
-        {
-          throw new Exception($errorMessage, $errorNumber);
-        }
       }
     }
 
