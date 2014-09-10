@@ -8,7 +8,7 @@
  */
 class Webhooks extends ApplicationObject
 {
-    const VERSION = '1.0.0';
+    const VERSION = '2.0.0';
 
     /**
      * Name of the table where records are stored
@@ -47,7 +47,8 @@ class Webhooks extends ApplicationObject
     static function handleEvent($event, $args)
     {
         // grab the webhook
-        $webhook = Webhooks::findByEventname($event);
+        $webhook = new Webhooks();
+        $webhook->findByEventname($event);
 
         // valid webhook?
         if ($webhook !== null) {
@@ -259,28 +260,45 @@ class Webhooks extends ApplicationObject
     /**
      * Return object by eventname
      *
-     * @param mixed $id
+     * @param mixed $event
      * @return SourceRepository
      */
     function findByEventname($event)
     {
         if (empty($event)) {
             return null;
-        } // if
+        }
 
-        $conditions = array();
-        $conditions[] = 'event = ' . DB::escape($event);
-
-        $object = DataManager::find(
-            array(
-                'conditions' => implode(' AND ', $conditions),
-                'one' => true
-            ),
-            TABLE_PREFIX . 'webhooks',
-            DataManager::CLASS_NAME_FROM_TABLE,
-            'Webhooks'
+        $row = DB::executeFirstRow(
+            'SELECT ' . implode(', ', $this->fields) .
+            ' FROM ' . $this->table_name .
+            ' WHERE event = ' . DB::escape($event)
         );
 
-        return $object;
+        if ($row === null) {
+            $this->setEvent($event);
+            return null;
+        }
+
+        $this->setNew(false);
+        $this->setId($row['id']);
+        $this->setCallback($row['callback']);
+        $this->setEvent($row['event']);
     } // findByEventname
+
+    /**
+     * Return name of this model
+     *
+     * @param boolean $underscore
+     * @param boolean $singular
+     * @return string
+     */
+    function getModelName($underscore = false, $singular = false)
+    {
+        if ($singular) {
+            return $underscore ? 'webhook' : 'Webhook';
+        } else {
+            return $underscore ? 'webhooks' : 'Webhooks';
+        } // if
+    } // getModelName
 }

@@ -29,11 +29,12 @@ class WebhooksAdminController extends AdminController
 
         // initialize
         foreach (Webhooks::getEvents() as $eventname) {
-            $webhook = Webhooks::findByEventname($eventname);
+            $webhook = new Webhooks();
+            $webhook->findByEventname($eventname);
 
             $webhooks_data['events'][$eventname] = array(
                 'name' => $eventname,
-                'enabled' => ($webhook !== null),
+                'enabled' => ($webhook->getCallback() !== null),
                 'callback' => ($webhook !== null) ? $webhook->getCallback() : null
             );
         }
@@ -68,11 +69,13 @@ class WebhooksAdminController extends AdminController
                 // loop validated data again
                 foreach (Webhooks::getEvents() as $eventname) {
                     // get the webhook
-                    $webhook = Webhooks::findByEventname($eventname);
+                    $webhook = new Webhooks();
+                    $webhook->findByEventname($eventname);
 
                     // we found a webhook
-                    if ($webhook != null) {
+                    if ($webhook->getId() != null) {
                         if (isset($webhooks_data['events'][$eventname]['enabled']) && $webhooks_data['events'][$eventname]['enabled']) {
+                            $webhook->setEvent($eventname);
                             $webhook->setCallback($webhooks_data['events'][$eventname]['callback']);
                             $webhook->save();
                         } // the webhook isn't active anymore, so delete it
@@ -81,7 +84,6 @@ class WebhooksAdminController extends AdminController
                         }
                     } // new webhook
                     elseif (isset($webhooks_data['events'][$eventname]['enabled']) && $webhooks_data['events'][$eventname]['enabled']) {
-                        $webhook = new Webhooks();
                         $webhook->setEvent($eventname);
                         $webhook->setCallback($webhooks_data['events'][$eventname]['callback']);
                         $webhook->save();
